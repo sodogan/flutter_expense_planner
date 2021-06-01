@@ -25,4 +25,12 @@ class Transaction {
       date: json["date"],
     );
   }
+
+  @override
+  String toString() {
+    return "id: $id "
+        "title: $title"
+        "amount: $amount"
+        "date: $date";
+  }
 }
