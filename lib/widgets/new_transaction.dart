@@ -1,13 +1,43 @@
 import 'package:flutter/material.dart';
-import '../models/transaction.dart';
 
-class NewTransaction extends StatelessWidget {
-  final Function onPressHandler;
+class NewTransaction extends StatefulWidget {
+  final Function addNewTransactionHandler;
 
+  static const String _labelTitle = "Title";
+  static const String _labelAmount = "Amount";
+  static const String _buttonLabel = "Add Transaction";
+
+  NewTransaction({required this.addNewTransactionHandler});
+
+  @override
+  _NewTransactionState createState() => _NewTransactionState();
+}
+
+class _NewTransactionState extends State<NewTransaction> {
   final titleController = new TextEditingController();
+
   final amountController = new TextEditingController();
 
-  NewTransaction({required this.onPressHandler});
+  void submitData() {
+    final String title = titleController.text;
+    final String amount = amountController.text;
+    final double? parsedAmount = double.tryParse(amount);
+
+    if (amount.isEmpty ||
+        title.isEmpty ||
+        parsedAmount == null ||
+        parsedAmount <= 0) {
+      //can also give an error message
+      return;
+    }
+
+    widget.addNewTransactionHandler(
+      title: titleController.text,
+      amount: double.parse(parsedAmount.toStringAsFixed(2)),
+    );
+    //close the modal as soon as new txn is added
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +55,10 @@ class NewTransaction extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
               decoration: InputDecoration(
-                labelText: 'Title',
+                labelText: NewTransaction._labelTitle,
               ),
               controller: titleController,
+              onSubmitted: (_) => submitData(),
             ),
             TextField(
               style: TextStyle(
@@ -35,26 +66,21 @@ class NewTransaction extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
               decoration: InputDecoration(
-                labelText: 'Amount',
+                labelText: NewTransaction._labelAmount,
               ),
               controller: amountController,
+              keyboardType: TextInputType.number,
+              onSubmitted: (_) => submitData(),
             ),
             Container(
               padding: EdgeInsets.all(4),
               margin: EdgeInsets.all(8),
               child: TextButton(
-                onPressed: () => onPressHandler(
-                  new Transaction(
-                    id: "12",
-                    title: titleController.text,
-                    amount: double.parse(amountController.text),
-                    date: DateTime.now(),
-                  ),
-                ),
+                onPressed: submitData,
                 child: Text(
-                  "Add Transaction",
+                  NewTransaction._buttonLabel,
                   style: TextStyle(
-                    color: Colors.purple,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
               ),
