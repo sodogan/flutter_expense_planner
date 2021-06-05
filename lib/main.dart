@@ -16,6 +16,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.purple,
         accentColor: Colors.indigo,
+        appBarTheme: AppBarTheme(
+          elevation: 12,
+          color: Colors.indigo,
+        ),
       ),
       debugShowCheckedModeBanner: false,
       home: MyHomePage(),
@@ -33,6 +37,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _userTransactions = [];
 
+  /// Adds a new transaction to the list and sets the state
   void _addNewTransaction({required String title, required double amount}) {
     // Create uuid object
     var uuid = Uuid();

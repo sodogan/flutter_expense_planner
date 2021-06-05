@@ -5,7 +5,9 @@ class NewTransaction extends StatefulWidget {
 
   static const String _labelTitle = "Title";
   static const String _labelAmount = "Amount";
-  static const String _buttonLabel = "Add Transaction";
+
+  /// Label for Add new transaction
+  static const String _buttonLabelAddTxn = "Add Transaction";
 
   NewTransaction({required this.addNewTransactionHandler});
 
@@ -33,7 +35,7 @@ class _NewTransactionState extends State<NewTransaction> {
 
     widget.addNewTransactionHandler(
       title: titleController.text,
-      amount: double.parse(parsedAmount.toStringAsFixed(2)),
+      amount: parsedAmount,
     );
     //close the modal as soon as new txn is added
     Navigator.of(context).pop();
@@ -78,7 +80,7 @@ class _NewTransactionState extends State<NewTransaction> {
               child: TextButton(
                 onPressed: submitData,
                 child: Text(
-                  NewTransaction._buttonLabel,
+                  NewTransaction._buttonLabelAddTxn,
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
                   ),
