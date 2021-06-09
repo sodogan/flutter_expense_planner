@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '/models/transaction.dart';
-import 'package:intl/intl.dart';
+import 'package:expense_planner/expense_planner.dart' as utility;
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> transactions;
@@ -8,14 +8,15 @@ class TransactionList extends StatelessWidget {
   TransactionList({required this.transactions});
 
   Widget _builder(BuildContext context, int index) {
-    var dateFormat = DateFormat.yMMMMEEEEd();
-
+    final double currentAmount = transactions[index].amount;
+    final String formattedAmount = utility.formatWithDecimals(currentAmount);
     return Card(
       child: Row(
         children: [
           Container(
             child: Text(
-              '\$ ${transactions[index].amount.toStringAsFixed(2)}',
+              //'\$ ${transactions[index].amount.toStringAsFixed(2)}',
+              '\$ $formattedAmount',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -40,13 +41,10 @@ class TransactionList extends StatelessWidget {
             children: [
               Text(
                 transactions[index].title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+                style: Theme.of(context).textTheme.headline6,
               ),
               Text(
-                dateFormat.format(transactions[index].date),
+                utility.formatDateWithWeekDay(transactions[index].date),
                 style: TextStyle(
                   color: Colors.grey,
                 ),
@@ -61,11 +59,29 @@ class TransactionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
-      child: ListView.builder(
-        itemBuilder: _builder,
-        itemCount: transactions.length,
-      ),
+      height: MediaQuery.of(context).size.height * 0.65,
+      child: transactions.isEmpty
+          ? Column(
+              children: [
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "No transactions yet",
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                Container(
+                  height: 200,
+                  child: Image.asset(
+                    'assets/images/waiting.png',
+                  ),
+                ),
+              ],
+            )
+          : ListView.builder(
+              itemBuilder: _builder,
+              itemCount: transactions.length,
+            ),
     );
   }
 }

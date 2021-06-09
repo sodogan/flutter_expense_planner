@@ -1,16 +1,20 @@
-//import "package:flutter/foundation.dart";
+import "package:flutter/foundation.dart";
+import 'package:meta/meta.dart';
 
+@immutable
 class Transaction {
   final String id;
   final String title;
   final double amount;
   final DateTime date;
 
-  const Transaction(
-      {required this.id,
-      required this.title,
-      required this.amount,
-      required this.date});
+  const Transaction({
+    required this.id,
+    required this.title,
+    required this.amount,
+    required this.date,
+  });
+
   Transaction.now({
     required this.id,
     required this.title,
