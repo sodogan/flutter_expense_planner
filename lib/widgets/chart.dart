@@ -8,41 +8,44 @@ class Chart extends StatelessWidget {
 
   const Chart({required this.weeklyTransactionSummary});
 
-  double get totalSumOfAllTransactions {
+  double get totalSumOfWeeklyTransactions {
     final double total = weeklyTransactionSummary.fold(
         0, (sum, current) => sum + current.totalSum);
     return total;
   }
 
-  double calculatePercentage(double sum, double totalSumOfAllTransactions) {
+  double calculatePercentage(double sum, double totalSumOfWeeklyTransactions) {
     if (sum == 0) {
       return 0;
     }
-    return (sum / totalSumOfAllTransactions) * 100;
+    return (sum / totalSumOfWeeklyTransactions);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Card(
-        elevation: 6,
-        margin: EdgeInsets.all(12),
+    return Card(
+      elevation: 12,
+      margin: EdgeInsets.all(6),
+      child: Padding(
+        padding: EdgeInsets.all(6),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             ...weeklyTransactionSummary.map((TransactionSummary summary) {
-              return ChartBar(
-                label: summary.day,
-                spendingAmount: summary.totalSum,
-                spendingPercentageOfTotal: calculatePercentage(
-                    summary.totalSum, totalSumOfAllTransactions),
+              return Flexible(
+                fit: FlexFit.tight,
+                child: ChartBar(
+                  label: summary.day,
+                  spendingAmount: summary.totalSum,
+                  spendingPercentageOfTotal: calculatePercentage(
+                      summary.totalSum, totalSumOfWeeklyTransactions),
+                ),
               );
             }),
           ],
         ),
-        color: Theme.of(context).primaryColor,
       ),
-      height: 150,
-      width: double.infinity,
+      // color: Theme.of(context).primaryColor,
     );
   }
 }

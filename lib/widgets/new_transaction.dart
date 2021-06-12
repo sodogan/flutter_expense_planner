@@ -49,7 +49,7 @@ class _NewTransactionState extends State<NewTransaction> {
       elevation: 5,
       child: Container(
         padding: EdgeInsets.all(8),
-        margin: EdgeInsets.all(20),
+        margin: EdgeInsets.all(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -70,7 +70,7 @@ class _NewTransactionState extends State<NewTransaction> {
               keyboardType: TextInputType.number,
               onSubmitted: (_) => _submitData(),
             ),
-            TextField(
+            /* TextField(
               style: Theme.of(context).textTheme.headline6,
               decoration: InputDecoration(
                 labelText: NewTransaction._labelDate,
@@ -89,9 +89,10 @@ class _NewTransactionState extends State<NewTransaction> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
+            ), 
+            */
             Container(
-              margin: EdgeInsets.all(8),
+              margin: EdgeInsets.all(4),
               child: TextButton(
                 onPressed: _submitData,
                 child: Text(

@@ -163,6 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Chart(
             weeklyTransactionSummary: weeklyTransactionSummary,

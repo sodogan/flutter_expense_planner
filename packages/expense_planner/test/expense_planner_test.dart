@@ -1,7 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:expense_planner/expense_planner.dart';
-
 void main() {
   test('adds one to input values', () {
     /*

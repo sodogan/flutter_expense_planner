@@ -11,13 +11,13 @@ String getDayKey(DateTime dateTime) => DateFormat.E().format(dateTime);
 
 //Formats the number with one decimal
 String numberFormat(num value) {
-  var formatter = NumberFormat(".##", "en_US");
+  var formatter = NumberFormat("###.##", "en_US");
   return formatter.format(value);
 }
 
 //format with decimals
-final String Function(num, {int decimals}) formatWithDecimals =
+final String Function(num, {int decimals}) formatWithFixedString =
     (num anyNumber, {int decimals = 2}) => anyNumber.toStringAsFixed(decimals);
 
-final String Function(num, int) formatWithDecimalsAgain =
+final String Function(num, int) _formatWithFixedString =
     (num anyNumber, [int decimals = 2]) => anyNumber.toStringAsFixed(decimals);
