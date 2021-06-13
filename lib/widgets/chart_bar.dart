@@ -20,6 +20,7 @@ class ChartBar extends StatelessWidget {
       children: [
         Container(
           padding: EdgeInsets.all(6),
+          height: 25,
           child: FittedBox(
             child: Text(
               '\$ ${utility.formatWithFixedString(

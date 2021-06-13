@@ -18,11 +18,17 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.purple,
         fontFamily: 'Quicksand',
+        errorColor: Colors.purple,
         textTheme: ThemeData.light().textTheme.copyWith(
               headline6: TextStyle(
                 fontFamily: 'OpenSans',
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+              ),
+              button: TextStyle(
+                fontFamily: 'OpenSans',
+                color: Colors.white,
+                fontSize: 18,
               ),
             ),
         accentColor: Colors.indigo,
@@ -75,6 +81,10 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _userTransactions.add(_newTransaction);
     });
+  }
+
+  void _deleteTransaction(int index) {
+    setState(() => _userTransactions.removeAt(index));
   }
 
 //Gets the recent transactions
@@ -163,13 +173,14 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
+        //mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Chart(
             weeklyTransactionSummary: weeklyTransactionSummary,
           ),
           TransactionList(
             transactions: _userTransactions,
+            deleteButtonPressedHandler: _deleteTransaction,
           ),
         ],
       ),
