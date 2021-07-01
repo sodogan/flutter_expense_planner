@@ -121,13 +121,22 @@ class TransactionList extends StatelessWidget {
                       utility.formatDateWithWeekDay(transactions[index].date),
                       style: Theme.of(context).textTheme.headline5,
                     ),
-                    trailing: IconButton(
-                      icon: Icon(
-                        Icons.delete,
-                        color: Theme.of(context).errorColor,
-                      ),
-                      onPressed: () => deleteButtonPressedHandler(index),
-                    ),
+                    trailing: MediaQuery.of(context).size.width > 400
+                        ? TextButton.icon(
+                            onPressed: () => deleteButtonPressedHandler(index),
+                            icon: Icon(
+                              Icons.delete,
+                              color: Theme.of(context).errorColor,
+                            ),
+                            label: const Text('Delete'),
+                          )
+                        : IconButton(
+                            icon: Icon(
+                              Icons.delete,
+                              color: Theme.of(context).errorColor,
+                            ),
+                            onPressed: () => deleteButtonPressedHandler(index),
+                          ),
                   ),
                 );
               },

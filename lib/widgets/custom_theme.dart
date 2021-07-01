@@ -39,7 +39,10 @@ ThemeData myCustomLightTheme() {
       fontFamily: 'Quicksand',
       errorColor: Colors.purple,
       textTheme: _textTheme,
-      accentColor: Colors.indigo,
+      colorScheme: ColorScheme.dark(
+        onPrimary: Colors.indigo,
+        onSecondary: Colors.amber,
+      ),
       appBarTheme: AppBarTheme(
         elevation: 12,
         textTheme: _appBarTextTheme,

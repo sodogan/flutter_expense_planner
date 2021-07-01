@@ -1,10 +1,13 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:expense_planner/expense_planner.dart' as utility;
 
 import './widgets/new_transaction.dart';
 import './widgets/transaction_list.dart';
-import 'widgets/custom_theme.dart';
+import './widgets/custom_theme.dart';
 import './widgets/chart.dart';
 import './models/transaction.dart';
 import './models/transaction_summary.dart';
@@ -47,6 +50,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _userTransactions = [];
+  var _isShowChart = false;
 
   /// Adds a new transaction to the list and sets the state
   void _addNewTransaction({
@@ -71,6 +75,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _deleteTransaction(int index) {
     setState(() => _userTransactions.removeAt(index));
+  }
+
+  void _changeSwitchMode(bool mode) {
+    setState(() {
+      _isShowChart = mode;
+    });
   }
 
 //Gets the recent transactions
@@ -163,42 +173,99 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ],
     );
+
     final _logicalSize = MediaQuery.of(context).size;
     final _statusBarHeight = MediaQuery.of(context).padding.top;
     final _appBarHeight = _appBar.preferredSize.height;
-    final _chartHeight =
-        (_logicalSize.height - _appBarHeight - _statusBarHeight) * 0.30;
-    final _transactionListHeight =
-        (_logicalSize.height - _appBarHeight - _statusBarHeight) * 0.70;
-    return Scaffold(
-      appBar: _appBar,
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              height: _chartHeight,
-              child: Chart(
-                weeklyTransactionSummary: weeklyTransactionSummary,
-              ),
-            ),
-            Container(
-              height: _transactionListHeight,
-              child: TransactionList(
-                transactions: _userTransactions,
-                deleteButtonPressedHandler: _deleteTransaction,
-              ),
+    final _remainingHeight =
+        (_logicalSize.height - _appBarHeight - _statusBarHeight);
+
+    final _isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape
+            ? true
+            : false;
+
+    final List<Widget> _portraitModeWidgetList = <Widget>[
+      Container(
+        height: _remainingHeight * 0.30,
+        child: Chart(
+          weeklyTransactionSummary: weeklyTransactionSummary,
+        ),
+      ),
+      Container(
+        height: _remainingHeight * 0.70,
+        child: TransactionList(
+          transactions: _userTransactions,
+          deleteButtonPressedHandler: _deleteTransaction,
+        ),
+      ),
+    ];
+
+    final List<Widget> _landscapeModeWidgetList = <Widget>[
+      Container(
+        height: _remainingHeight * 0.2,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Show Chart'),
+            Switch.adaptive(
+              value: _isShowChart,
+              onChanged: _changeSwitchMode,
+              activeColor: Theme.of(context).colorScheme.secondary,
             ),
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(
-          Icons.add,
+      if (_isShowChart)
+        Container(
+          height: _remainingHeight * 0.6,
+          child: Chart(
+            weeklyTransactionSummary: weeklyTransactionSummary,
+          ),
         ),
-        onPressed: () => _displayNewTransactionModal(context),
-      ),
-    );
+      if (!_isShowChart)
+        Container(
+          height: _remainingHeight * 0.7,
+          child: TransactionList(
+            transactions: _userTransactions,
+            deleteButtonPressedHandler: _deleteTransaction,
+          ),
+        ),
+    ];
+
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  if (!_isLandscape) ..._portraitModeWidgetList,
+                  if (_isLandscape) ..._landscapeModeWidgetList,
+                ],
+              ),
+            ),
+          )
+        : Scaffold(
+            appBar: _appBar,
+            body: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  if (!_isLandscape) ..._portraitModeWidgetList,
+                  if (_isLandscape) ..._landscapeModeWidgetList,
+                ],
+              ),
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : FloatingActionButton(
+                    child: const Icon(
+                      Icons.add,
+                    ),
+                    onPressed: () => _displayNewTransactionModal(context),
+                  ),
+          );
   }
 }

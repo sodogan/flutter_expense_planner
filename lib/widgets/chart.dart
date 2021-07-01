@@ -6,7 +6,10 @@ import '../models/transaction_summary.dart';
 class Chart extends StatelessWidget {
   final List<TransactionSummary> weeklyTransactionSummary;
 
-  const Chart({required this.weeklyTransactionSummary});
+  const Chart({Key? key, required this.weeklyTransactionSummary})
+      : super(
+          key: key,
+        );
 
   double get totalSumOfWeeklyTransactions {
     final double total = weeklyTransactionSummary.fold(
@@ -17,7 +20,9 @@ class Chart extends StatelessWidget {
   }
 
   double calculatePercentage(double sum, double totalSumOfWeeklyTransactions) {
-    return (sum / totalSumOfWeeklyTransactions);
+    return totalSumOfWeeklyTransactions > 0
+        ? (sum / totalSumOfWeeklyTransactions)
+        : 0.0;
   }
 
   @override
