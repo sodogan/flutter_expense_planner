@@ -1,23 +1,39 @@
 import 'package:expense_planner/expense_planner.dart' as utility;
 
-class TransactionSummary {
+class TransactionSummary implements Comparable<TransactionSummary> {
   final DateTime dateTime;
-  final double totalSum;
+  final double dailySum;
   final String day;
 
-  TransactionSummary({required this.dateTime, required this.totalSum})
-      : this.day = utility.getDayKey(dateTime);
+  const TransactionSummary({
+    required this.dateTime,
+    required this.dailySum,
+    required this.day,
+  });
+
+  TransactionSummary.withDayKey(
+      {required DateTime dateTime, required double dailySum})
+      : this(
+          dateTime: dateTime,
+          dailySum: dailySum,
+          day: utility.getDayKey(dateTime),
+        );
 
   factory TransactionSummary.fromJSON(Map<String, Object> json) =>
-      TransactionSummary(
+      TransactionSummary.withDayKey(
         dateTime: json['dateTime'] as DateTime,
-        totalSum: json['totalSum'] as double,
+        dailySum: json['dailySum'] as double,
       );
 
   @override
+  int compareTo(TransactionSummary other) {
+    return dateTime.compareTo(other.dateTime);
+  }
+
+  @override
   String toString() {
-    return "dateTime: $dateTime\n"
-        "day     :  $day\n"
-        "amount  :  $totalSum\n";
+    return 'dateTime: $dateTime\n'
+        'day     :  $day\n'
+        'daily amount  :  $dailySum\n';
   }
 }

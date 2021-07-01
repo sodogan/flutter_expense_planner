@@ -10,14 +10,13 @@ class Chart extends StatelessWidget {
 
   double get totalSumOfWeeklyTransactions {
     final double total = weeklyTransactionSummary.fold(
-        0, (sum, current) => sum + current.totalSum);
+      0,
+      (sum, current) => sum + current.dailySum,
+    );
     return total;
   }
 
   double calculatePercentage(double sum, double totalSumOfWeeklyTransactions) {
-    if (sum == 0) {
-      return 0;
-    }
     return (sum / totalSumOfWeeklyTransactions);
   }
 
@@ -25,9 +24,9 @@ class Chart extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 12,
-      margin: EdgeInsets.all(6),
+      margin: const EdgeInsets.all(6),
       child: Padding(
-        padding: EdgeInsets.all(6),
+        padding: const EdgeInsets.all(6),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -36,9 +35,11 @@ class Chart extends StatelessWidget {
                 fit: FlexFit.tight,
                 child: ChartBar(
                   label: summary.day,
-                  spendingAmount: summary.totalSum,
+                  spendingAmount: summary.dailySum,
                   spendingPercentageOfTotal: calculatePercentage(
-                      summary.totalSum, totalSumOfWeeklyTransactions),
+                    summary.dailySum,
+                    totalSumOfWeeklyTransactions,
+                  ),
                 ),
               );
             }),

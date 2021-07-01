@@ -1,48 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import 'package:expense_planner/expense_planner.dart' as utility;
 
 import './widgets/new_transaction.dart';
 import './widgets/transaction_list.dart';
+import 'widgets/custom_theme.dart';
 import './widgets/chart.dart';
 import './models/transaction.dart';
 import './models/transaction_summary.dart';
-import 'package:expense_planner/expense_planner.dart' as utility;
 
-void main() => runApp(MyApp());
+void main() {
+/* For forcing only portrait mode !
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+    <DeviceOrientation>[
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown
+    ],
+  ).then(
+    (_) => runApp(MyApp()),
+  );
+ */
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Expense Planner',
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-        fontFamily: 'Quicksand',
-        errorColor: Colors.purple,
-        textTheme: ThemeData.light().textTheme.copyWith(
-              headline6: TextStyle(
-                fontFamily: 'OpenSans',
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-              button: TextStyle(
-                fontFamily: 'OpenSans',
-                color: Colors.white,
-                fontSize: 18,
-              ),
-            ),
-        accentColor: Colors.indigo,
-        appBarTheme: AppBarTheme(
-          elevation: 12,
-          textTheme: ThemeData.light().textTheme.copyWith(
-                headline6: TextStyle(
-                  fontFamily: 'OpenSans',
-                  color: Colors.white,
-                  fontSize: 18,
-                ),
-              ),
-        ),
-      ),
+      theme: myCustomLightTheme(),
       debugShowCheckedModeBanner: false,
       home: MyHomePage(),
     );
@@ -65,18 +54,15 @@ class _MyHomePageState extends State<MyHomePage> {
     required double amount,
     required DateTime dateTime,
   }) {
-    // Create uuid object
-    final uuid = const Uuid();
-
     //create a new Transaction
     final _newTransaction = Transaction(
-      id: uuid.v1(),
+      id: const Uuid().v1(),
       title: title,
       amount: amount,
       date: dateTime,
     );
 
-    print("Adding a new transaction: $_newTransaction");
+    print('Adding a new transaction: $_newTransaction');
 
     setState(() {
       _userTransactions.add(_newTransaction);
@@ -89,43 +75,50 @@ class _MyHomePageState extends State<MyHomePage> {
 
 //Gets the recent transactions
   List<TransactionSummary> get weeklyTransactionSummary {
-    print("trying to get one weeks of trsansactions");
     final List<Map<String, Object>> mappedTransactions =
         _buildMatchingTransactionsMap();
 
 //Build the transaction summary
     final List<TransactionSummary> transactionSummaryList =
         mappedTransactions.map((Map<String, Object> entry) {
-      return new TransactionSummary.fromJSON(entry);
+      return TransactionSummary.fromJSON(entry);
     }).toList();
 
 //sort it based on the date ascending
-    transactionSummaryList.sort((TransactionSummary a, TransactionSummary b) =>
-        a.dateTime.compareTo(b.dateTime));
+    transactionSummaryList.sort(
+      (TransactionSummary a, TransactionSummary b) => a.dateTime.compareTo(
+        b.dateTime,
+      ),
+    );
 
+    // ignore: avoid_print
     print(transactionSummaryList);
     return transactionSummaryList;
   }
 
   List<Map<String, Object>> _buildMatchingTransactionsMap() {
-    List<DateTime> datesList = utility.generateWeekList();
+//    List<DateTime> datesList = utility.generateWeekList();
+    final _weekList = utility.weeklyListGenerator();
 
-    List<Map<String, Object>> result = [];
-    for (var date in datesList) {
-      //print(date);
+    final List<Map<String, Object>> result = [];
+    var _dailySum = 0.0;
+    for (final date in _weekList) {
+      Iterable<Transaction> _filtered = _userTransactions.where(
+        (Transaction transaction) => (date.year == transaction.date.year &&
+            date.month == transaction.date.month &&
+            date.day == transaction.date.day),
+      );
 
-      List<Transaction> filtered = _userTransactions
-          .where((Transaction transaction) =>
-              (date.year == transaction.date.year &&
-                  date.month == transaction.date.month &&
-                  date.day == transaction.date.day))
-          .toList();
+      _dailySum = _filtered.isNotEmpty
+          ? _filtered.fold(0, (sum, current) => sum + current.amount)
+          : 0.0;
 
-      final double totalSum =
-          filtered.fold(0, (sum, current) => sum + current.amount);
-
-      //result[date] = filtered;
-      result.add({"dateTime": date, "totalSum": totalSum});
+      result.add(
+        {
+          'dateTime': date,
+          'dailySum': _dailySum,
+        },
+      );
     }
     return result;
   }
@@ -138,11 +131,11 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (BuildContext bctx) {
         return GestureDetector(
           onTap: () {
-            print("Tap is pressed");
+            print('Tap is pressed');
             //Navigator.pop(bctx);
           },
           onDoubleTap: () {
-            print("Double Tap is pressed");
+            print('Double Tap is pressed');
           },
           behavior: HitTestBehavior.opaque,
           child: NewTransaction(
@@ -155,38 +148,53 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Center(
-          child: Text(
-            '${widget._pageTitle}',
-          ),
+    final _appBar = AppBar(
+      title: Center(
+        child: Text(
+          widget._pageTitle,
         ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.add,
-            ),
-            onPressed: () => _displayNewTransactionModal(context),
-          ),
-        ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        //mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Chart(
-            weeklyTransactionSummary: weeklyTransactionSummary,
+      actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.add,
           ),
-          TransactionList(
-            transactions: _userTransactions,
-            deleteButtonPressedHandler: _deleteTransaction,
-          ),
-        ],
+          onPressed: () => _displayNewTransactionModal(context),
+        ),
+      ],
+    );
+    final _logicalSize = MediaQuery.of(context).size;
+    final _statusBarHeight = MediaQuery.of(context).padding.top;
+    final _appBarHeight = _appBar.preferredSize.height;
+    final _chartHeight =
+        (_logicalSize.height - _appBarHeight - _statusBarHeight) * 0.30;
+    final _transactionListHeight =
+        (_logicalSize.height - _appBarHeight - _statusBarHeight) * 0.70;
+    return Scaffold(
+      appBar: _appBar,
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              height: _chartHeight,
+              child: Chart(
+                weeklyTransactionSummary: weeklyTransactionSummary,
+              ),
+            ),
+            Container(
+              height: _transactionListHeight,
+              child: TransactionList(
+                transactions: _userTransactions,
+                deleteButtonPressedHandler: _deleteTransaction,
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
-        child: Icon(
+        child: const Icon(
           Icons.add,
         ),
         onPressed: () => _displayNewTransactionModal(context),
