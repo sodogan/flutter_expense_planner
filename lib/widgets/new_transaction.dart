@@ -1,27 +1,55 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:expense_planner/expense_planner.dart' as utility;
+
+import 'adaptive_text_button.dart';
 
 class NewTransaction extends StatefulWidget {
   final Function addNewTransactionHandler;
 
-  const NewTransaction({
+  NewTransaction({
     Key? key,
     required this.addNewTransactionHandler,
-  }) : super(key: key);
+  }) : super(key: key) {
+    print('Constructor in NewTransaction widget');
+  }
 
   @override
-  _NewTransactionState createState() => _NewTransactionState();
+  _NewTransactionState createState() {
+    print('CreateState in NewTransaction widget');
+
+    return _NewTransactionState();
+  }
 }
 
 class _NewTransactionState extends State<NewTransaction> {
-  final _titleController = TextEditingController();
-  final _amountController = TextEditingController();
+  final TextEditingController _titleController;
+  final TextEditingController _amountController;
   DateTime? _selectedDate;
 
+  _NewTransactionState()
+      : _titleController = TextEditingController(),
+        _amountController = TextEditingController() {
+    print('Constructor in NewTransaction state');
+  }
   @override
   void initState() {
     super.initState();
+    print('InitState is called');
+  }
+
+  @override
+  void didUpdateWidget(covariant NewTransaction oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print('DidupdateWidget is called');
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    print('Dispose is called');
   }
 
   void _submitData() {
@@ -119,18 +147,10 @@ class _NewTransactionState extends State<NewTransaction> {
                       ),
                     ),
                     Expanded(
-                      child: TextButton(
-                        onPressed: _presentDatePicker,
-                        child: Text(
-                          _buttonLabelChooseDate,
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
+                        child: AdaptiveTextButton(
+                      datePickerHandler: _presentDatePicker,
+                      label: _buttonLabelChooseDate,
+                    )),
                   ],
                 ),
               ),

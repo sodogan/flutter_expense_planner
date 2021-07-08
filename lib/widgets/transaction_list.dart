@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import '/models/transaction.dart';
 import 'package:expense_planner/expense_planner.dart' as utility;
+
+import '/models/transaction.dart';
+import './transaction_item.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> transactions;
   final Function deleteButtonPressedHandler;
+
   const TransactionList({
     Key? key,
     required this.transactions,
@@ -93,55 +96,33 @@ class TransactionList extends StatelessWidget {
           ? _noTransactionsView(
               textStyle: Theme.of(context).textTheme.headline6,
               size: constraints.maxHeight)
-          : ListView.builder(
-              itemBuilder: (context, int index) {
-                final double currentAmount = transactions[index].amount;
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    vertical: 4,
-                    horizontal: 6,
-                  ),
-                  elevation: 6,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 30,
-                      child: Padding(
-                        padding: const EdgeInsets.all(6),
-                        child: FittedBox(
-                          child: Text(
-                              '\$ ${utility.formatWithFixedString(currentAmount)}'),
-                        ),
-                      ),
-                    ),
-                    title: Text(
-                      transactions[index].title,
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                    subtitle: Text(
-                      utility.formatDateWithWeekDay(transactions[index].date),
-                      style: Theme.of(context).textTheme.headline5,
-                    ),
-                    trailing: MediaQuery.of(context).size.width > 400
-                        ? TextButton.icon(
-                            onPressed: () => deleteButtonPressedHandler(index),
-                            icon: Icon(
-                              Icons.delete,
-                              color: Theme.of(context).errorColor,
-                            ),
-                            label: const Text('Delete'),
-                          )
-                        : IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: Theme.of(context).errorColor,
-                            ),
-                            onPressed: () => deleteButtonPressedHandler(index),
-                          ),
-                  ),
+          : true
+              ? ListView(
+                  children: [
+                    ...transactions.map((Transaction _transaction) {
+                      return TransactionItem(
+                        key: ValueKey(_transaction.id),
+                        transaction: _transaction,
+                        deleteButtonPressedHandler: () =>
+                            deleteButtonPressedHandler(id: _transaction.id),
+                      );
+                    }).toList()
+                  ],
+                )
+              : ListView.builder(
+                  itemBuilder: (context, int index) {
+                    final _transaction = transactions[index];
+                    final _key = ValueKey(_transaction.id);
+                    print('build is called-transaction item with key ${_key}');
+                    return TransactionItem(
+                      key: ValueKey(_key),
+                      transaction: _transaction,
+                      deleteButtonPressedHandler: () =>
+                          deleteButtonPressedHandler(index: index),
+                    );
+                  },
+                  itemCount: transactions.length,
                 );
-              },
-              itemCount: transactions.length,
-            );
     });
   }
 }
